@@ -1,0 +1,15 @@
+{
+    "id": 6,
+    "title": "Monitor Samsung 27 pulgadas",
+    "description": "Monitor LED curvo de 27 pulgadas con resolución 1080p",
+    "code": "MNTR-001",
+    "price": 300,
+    "status": true,
+    "stock": 10,
+    "category": "Hardware",
+    "thumbnails": [
+      "https://example.com/monitor-1.jpg",
+      "https://example.com/monitor-2.jpg"
+    ]
+  }
+  
