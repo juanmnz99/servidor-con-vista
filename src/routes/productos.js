@@ -1,72 +1,68 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const productos = require("../api/productos");
+const Product = require('../models/Product');
 
-router.get("/listar", async (req, res) => {
+// GET /api/products
+router.get('/', async (req, res) => {
   try {
-    const prods = await productos.listar();
-    if (prods.length > 0) {
-      res.json(prods);
-    } else {
-      res.json({ error: "no hay productos cargados" });
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const sort = req.query.sort || '';
+    const query = req.query.query || '';
+    
+    // Construir el objeto de filtro
+    const filter = {};
+    if (query) {
+      filter.$or = [
+        { category: { $regex: query, $options: 'i' } },
+        { availability: { $regex: query, $options: 'i' } }
+      ];
     }
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-router.get("/listar/:id", async (req, res) => {
-  try {
-    const prod = await productos.listarPorId(req.params.id);
-    if (prod) {
-      res.json(prod);
-    } else {
-      res.json({ error: "producto no encontrado" });
+    
+    // Contar el total de productos
+    const totalCount = await Product.countDocuments(filter);
+    
+    // Calcular el total de páginas y ajustar la página actual
+    const totalPages = Math.ceil(totalCount / limit);
+    const adjustedPage = Math.min(page, totalPages);
+    
+    // Calcular el índice de inicio y fin para la consulta
+    const startIndex = (adjustedPage - 1) * limit;
+    const endIndex = adjustedPage * limit;
+    
+    // Construir el objeto de ordenamiento
+    const sortOptions = {};
+    if (sort === 'asc') {
+      sortOptions.price = 1;
+    } else if (sort === 'desc') {
+      sortOptions.price = -1;
     }
+    
+    // Consultar los productos con paginación y ordenamiento
+    const products = await Product.find(filter)
+      .sort(sortOptions)
+      .limit(limit)
+      .skip(startIndex)
+      .exec();
+    
+    // Construir el objeto de respuesta
+    const response = {
+      status: 'success',
+      payload: products,
+      totalPages: totalPages,
+      prevPage: adjustedPage > 1 ? adjustedPage - 1 : null,
+      nextPage: adjustedPage < totalPages ? adjustedPage + 1 : null,
+      page: adjustedPage,
+      hasPrevPage: adjustedPage > 1,
+      hasNextPage: adjustedPage < totalPages,
+      prevLink: adjustedPage > 1 ? `/api/products?limit=${limit}&page=${adjustedPage - 1}&sort=${sort}&query=${query}` : null,
+      nextLink: adjustedPage < totalPages ? `/api/products?limit=${limit}&page=${adjustedPage + 1}&sort=${sort}&query=${query}` : null
+    };
+    
+    res.json(response);
   } catch (error) {
-    console.log(error);
-  }
-});
-
-router.post("/agregar", async (req, res) => {
-  try {
-    const { title, price, thumbnail } = req.body;
-    if (title && price && thumbnail) {
-      const prod = await productos.guardar({ title, price, thumbnail });
-      res.json(prod);
-    } else {
-      res.json({ error: "debe ingresar title, price y thumbnail" });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-router.put("/actualizar/:id", async (req, res) => {
-  try {
-    const { title, price, thumbnail } = req.body;
-    const id = req.params.id;
-    const prod = await productos.actualizar({ id, title, price, thumbnail });
-    if (prod) {
-      res.json(prod);
-    } else {
-      res.json({ error: "producto no encontrado" });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-router.delete("/borrar/:id", async (req, res) => {
-  try {
-    const prod = await productos.borrar(req.params.id);
-    if (prod) {
-      res.json(prod);
-    } else {
-      res.json({ error: "producto no encontrado" });
-    }
-  } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
   }
 });
 
