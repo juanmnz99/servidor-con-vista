@@ -1,26 +1,35 @@
 const express = require('express');
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const path = require('path');
+const exphbs = require('express-handlebars');
+
+
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
+
+
+app.use(express.json());
+
+
 const productsRouter = require('./routes/products');
-const viewsRouter = require('./routes/views');
-const handlebars = require('express-handlebars');
+const cartsRouter = require('./routes/carts');
 
-app.engine(
-  'hbs',
-  handlebars({
-    extname: 'hbs',
-    defaultLayout: 'index.hbs',
-    layoutsDir: __dirname + '/views/layouts',
-  })
-);
 
-app.set('views', './views');
-app.set('view engine', 'hbs');
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/api/products', productsRouter);
-app.use('/', viewsRouter);
+app.use('/api/carts', cartsRouter);
 
-server.listen(8080, () => {
-  console.log('Servidor HTTP escuchando en el puerto 8080');
+
+app.get('/', (req, res) => {
+  res.render('index', {
+    title: 'E-commerce',
+    message: 'Bienvenido al E-commerce',
+  });
+});
+
+
+app.listen(8080, () => {
+  console.log('Servidor escuchando en el puerto 8080');
 });
