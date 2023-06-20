@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 
 
@@ -91,4 +91,53 @@ router.get('/github', passport.authenticate('github'));
 router.get('/github/callback', passport.authenticate('github', {
   successRedirect: '/products',
   failureRedirect: '/login'
-}));
+}));*/
+const express = require('express');
+const router = express.Router();
+const passport = require('passport');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const User = require('../models/user');
+
+
+router.post('/register', async (req, res, next) => {
+  try {
+    const { first_name, last_name, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      first_name,
+      last_name,
+      email,
+      password: hashedPassword
+    });
+    await newUser.save();
+    res.json({ message: 'User registered successfully' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ error: info.message });
+    }
+    req.login(user, { session: false }, async (err) => {
+      if (err) {
+        return next(err);
+      }
+      const token = jwt.sign({ id: user._id }, 'your_secret_key');
+      return res.json({ token });
+    });
+  })(req, res, next);
+});
+
+module.exports = router;
