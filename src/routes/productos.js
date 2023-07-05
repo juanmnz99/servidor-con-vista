@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 
@@ -66,4 +66,21 @@ router.get('/', async (req, res) => {
   }
 });
 
+module.exports = router;*/
+// productos.js
+const express = require('express');
+const router = express.Router();
+const productosController = require('../controllers/productosController');
+
+router.get('/', productosController.obtenerProductos);
+
+router.post('/', productosController.crearProducto);
+
+router.get('/:id', productosController.obtenerProductoPorId);
+
+router.put('/:id', productosController.actualizarProducto);
+
+router.delete('/:id', productosController.eliminarProducto);
+
 module.exports = router;
+
