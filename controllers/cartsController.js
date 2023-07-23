@@ -5,6 +5,25 @@ const Cart = require('../models/Cart');
 const Producto = require('../models/Producto');
 
 
+const { createCustomError } = require('../errorHandler');
+
+
+function getProductById(req, res, next) {
+  const productId = req.params.pid;
+
+
+  const product = null;
+
+  if (!product) {
+    const error = createCustomError('Producto no encontrado', 404);
+    return next(error);
+  }
+
+ 
+}
+
+
+
 
 
 class CartsController {
