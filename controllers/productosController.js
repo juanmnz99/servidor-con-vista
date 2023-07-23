@@ -1,17 +1,21 @@
 
-const Producto = require('../models/producto');
+const ProductoRepository = require('../repositories/productoRepository');
 
-const productosController = {
-  obtenerProductos: async (req, res) => {
+class ProductosController {
+  constructor(daoType) {
+    this.productoRepository = new ProductoRepository(daoType);
+  }
+
+  async obtenerProductos(req, res) {
     try {
-      const productos = await Producto.find();
+      const productos = await this.productoRepository.obtenerProductos();
       res.json(productos);
     } catch (error) {
       res.status(500).json({ error: 'Error al obtener los productos' });
     }
-  },
+  }
 
- 
-};
+  
+}
 
-module.exports = productosController;
+module.exports = ProductosController;

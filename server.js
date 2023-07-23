@@ -1,35 +1,26 @@
+// server.js
 const express = require('express');
 const app = express();
-const path = require('path');
-const exphbs = require('express-handlebars');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const passport = require('passport');
+const authRoutes = require('./routes/auth');
+const productosRoutes = require('./routes/productos');
+const cartsRoutes = require('./routes/carts'); // Agregar esta línea
 
-
-app.engine('handlebars', exphbs());
-app.set('view engine', 'handlebars');
-
-
-app.use(express.json());
-
-
-const productsRouter = require('./routes/products');
-const cartsRouter = require('./routes/carts');
-
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-app.use('/api/products', productsRouter);
-app.use('/api/carts', cartsRouter);
-
-
-app.get('/', (req, res) => {
-  res.render('index', {
-    title: 'E-commerce',
-    message: 'Bienvenido al E-commerce',
-  });
+dotenv.config();
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
+app.use(express.json());
+app.use(passport.initialize());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/productos', productosRoutes);
+app.use('/api/carts', cartsRoutes); // Agregar esta línea
 
 app.listen(8080, () => {
-  console.log('Servidor escuchando en el puerto 8080');
+  console.log('Servidor iniciado en el puerto 8080');
 });
