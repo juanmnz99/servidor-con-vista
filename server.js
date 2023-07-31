@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 const productsRouter = require('./routes/products');
-const { generateMockProducts } = require('./routes/mockData'); 
+const logger = require('./logger'); 
 
 
 app.get('/mockingproducts', (req, res) => {
@@ -14,27 +14,21 @@ app.get('/mockingproducts', (req, res) => {
 app.use('/api/products', productsRouter);
 
 
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const passport = require('passport');
-const authRoutes = require('./routes/auth');
-const productosRoutes = require('./routes/productos');
-const cartsRoutes = require('./routes/carts'); 
-
-dotenv.config();
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+app.get('/loggerTest', (req, res) => {
+  logger.debug('Este es un mensaje de debug');
+  logger.info('Este es un mensaje de info');
+  logger.warn('Este es un mensaje de warning');
+  logger.error('Este es un mensaje de error');
+ 
+  throw new Error('Este es un error fatal');
 });
 
-app.use(express.json());
-app.use(passport.initialize());
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+  res.status(500).send('Algo salió mal!');
+});
 
-app.use('/api/auth', authRoutes);
-app.use('/api/productos', productosRoutes);
-app.use('/api/carts', cartsRoutes); 
-
-app.listen(8080, () => {
-  console.log('Servidor iniciado en el puerto 8080');
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  logger.info(`Servidor corriendo en el puerto ${PORT}`);
 });
