@@ -1,34 +1,64 @@
-
 const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const passport = require('passport');
+const swaggerUI = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc');
+const winston = require('winston');
+const expressWinston = require('express-winston');
+
+
 const app = express();
+
+
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'E-commerce API',
+    version: '1.0.0',
+    description: 'API documentation for the E-commerce project',
+  },
+  servers: [
+    {
+      url: 'http://localhost:8080',
+    },
+  ],
+};
+const options = {
+  swaggerDefinition,
+  apis: ['./routes/*.js'], 
+};
+const swaggerSpec = swaggerJSDoc(options);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+
+
+const logger = winston.createLogger({
+  level: 'info', 
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console({ format: winston.format.simple() }),
+    new winston.transports.File({ filename: 'errors.log', level: 'error' }),
+  ],
+});
+app.use(expressWinston.logger({ winstonInstance: logger }));
+
+
 const productsRouter = require('./routes/products');
-const logger = require('./logger'); 
-
-
-app.get('/mockingproducts', (req, res) => {
-  const mockProducts = generateMockProducts();
-  res.json(mockProducts);
-});
-
-
+const cartsRouter = require('./routes/carts');
+const usersRouter = require('./routes/users');
 app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+app.use('/api/users', usersRouter);
 
-
-app.get('/loggerTest', (req, res) => {
-  logger.debug('Este es un mensaje de debug');
-  logger.info('Este es un mensaje de info');
-  logger.warn('Este es un mensaje de warning');
-  logger.error('Este es un mensaje de error');
- 
-  throw new Error('Este es un error fatal');
-});
-
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(500).send('Algo salió mal!');
-});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  logger.info(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

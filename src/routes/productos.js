@@ -84,3 +84,42 @@ router.delete('/:id', productosController.eliminarProducto);
 
 module.exports = router;
 
+// routes/products.js
+
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Obtener la lista de productos
+ *     responses:
+ *       200:
+ *         description: Lista de productos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ */
+router.get('/api/products', productsController.getProducts);
+
+/**
+ * @swagger
+ * /api/products/{pid}:
+ *   get:
+ *     summary: Obtener un producto por ID
+ *     parameters:
+ *       - in: path
+ *         name: pid
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalles del producto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ */
+router.get('/api/products/:pid', productsController.getProductById);
+
+
