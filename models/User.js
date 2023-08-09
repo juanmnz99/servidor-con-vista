@@ -37,11 +37,19 @@ userSchema.pre('save', function(next) {
       next();
     });
   });
-});*/
+});*/const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  // ... other fields
+  role: { type: String, enum: ['user', 'admin', 'premium'], default: 'user' },
+});
+
+module.exports = mongoose.model('User', userSchema);
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
+/*const userSchema = new mongoose.Schema({
   first_name: {
     type: String,
     required: true
@@ -85,4 +93,4 @@ userSchema.pre('save', async function(next) {
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+module.exports = User;*/
