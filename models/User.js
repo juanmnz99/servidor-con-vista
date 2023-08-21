@@ -49,48 +49,35 @@ module.exports = mongoose.model('User', userSchema);
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-/*const userSchema = new mongoose.Schema({
-  first_name: {
-    type: String,
-    required: true
-  },
-  last_name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  age: {
-    type: Number
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  cart: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Cart'
-  },
-  role: {
-    type: String,
-    default: 'user'
-  }
-});
+const express = require('express');
+const router = express.Router();
+const usersController = require('../controllers/usersController');
 
-userSchema.pre('save', async function(next) {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(this.password, salt);
-    this.password = hash;
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+/**
+ * @swagger
+ * /api/users/premium/{uid}:
+ *   put:
+ *     summary: Cambiar el rol de un usuario a "premium" o "user"
+ *     parameters:
+ *       - in: path
+ *         name: uid
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: role
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [premium, user]
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado exitosamente
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error en el servidor
+ */
+router.put('/api/users/premium/:uid', usersController.updateUserRole);
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;*/
+module.exports = router;
