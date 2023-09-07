@@ -1,83 +1,42 @@
-/*const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user'
-  }
-});
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
-const bcrypt = require('bcrypt');
-
-userSchema.pre('save', function(next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
-
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) return next(err);
-
-    bcrypt.hash(this.password, salt, (err, hash) => {
-      if (err) return next(err);
-
-      this.password = hash;
-      next();
-    });
-  });
-});*/const mongoose = require('mongoose');
-
-const userSchema = new mongoose.Schema({
-  // ... other fields
-  role: { type: String, enum: ['user', 'admin', 'premium'], default: 'user' },
+  documents: [
+    {
+      name: String,
+      reference: String,
+    },
+  ],
+  last_connection: Date,
 });
 
 module.exports = mongoose.model('User', userSchema);
+const multer = require('multer');
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 
-const express = require('express');
-const router = express.Router();
-const usersController = require('../controllers/usersController');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    
+    if (file.fieldname === 'profileImage') {
+      cb(null, 'uploads/profiles');
+    } else if (file.fieldname === 'productImage') {
+      cb(null, 'uploads/products');
+    } else if (file.fieldname === 'document') {
+      cb(null, 'uploads/documents');
+    } else {
+      cb(new Error('Tipo de archivo no válido'), false);
+    }
+  },
+  filename: (req, file, cb) => {
+    
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const fileExtension = file.originalname.split('.').pop();
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + fileExtension);
+  },
+});
 
-/**
- * @swagger
- * /api/users/premium/{uid}:
- *   put:
- *     summary: Cambiar el rol de un usuario a "premium" o "user"
- *     parameters:
- *       - in: path
- *         name: uid
- *         required: true
- *         schema:
- *           type: string
- *       - in: query
- *         name: role
- *         required: true
- *         schema:
- *           type: string
- *           enum: [premium, user]
- *     responses:
- *       200:
- *         description: Usuario actualizado exitosamente
- *       404:
- *         description: Usuario no encontrado
- *       500:
- *         description: Error en el servidor
- */
-router.put('/api/users/premium/:uid', usersController.updateUserRole);
+const upload = multer({ storage });
 
-module.exports = router;
+
+router.post('/:uid/documents', upload.single('document'), usersController.uploadDocuments);
