@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Completar Compra</title>
+</head>
+<body>
+    <h1>Completar Compra</h1>
+    <h2>Resumen de Compra</h2>
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+        <% carrito.forEach(function(item) { %>
+            <tr>
+                <td><%= item.producto.nombre %></td>
+                <td>$<%= item.producto.precio %></td>
+                <td><%= item.cantidad %></td>
+                <td>$<%= item.subtotal %></td>
+            </tr>
+        <% }); %>
+    </table>
+    <p>Total: $<%= totalCarrito %></p>
+   
+    <form action="/compra/finalizar" method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+        <label for="direccion">Dirección:</label>
+        <input type="text" id="direccion" name="direccion" required><br>
+        <label for="tarjeta">Número de Tarjeta:</label>
+        <input type="text" id="tarjeta" name="tarjeta" required><br>
+        <button type="submit">Confirmar Compra</button>
+    </form>
+</body>
+</html>
+

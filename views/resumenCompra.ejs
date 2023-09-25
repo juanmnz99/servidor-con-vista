@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen de Compra</title>
+</head>
+<body>
+    <h1>Resumen de Compra</h1>
+    <h2>Detalle de Compra</h2>
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+        <% carrito.forEach(function(item) { %>
+            <tr>
+                <td><%= item.producto.nombre %></td>
+                <td>$<%= item.producto.precio %></td>
+                <td><%= item.cantidad %></td>
+                <td>$<%= item.subtotal %></td>
+            </tr>
+        <% }); %>
+    </table>
+    <p>Total: $<%= totalCarrito %></p>
+    <h2>Información de Envío</h2>
+    <p>Nombre: <%= nombre %></p>
+    <p>Dirección: <%= direccion %></p>
+    <h2>Confirmación de Compra</h2>
+    <p>¡Gracias por tu compra! Tu pedido ha sido confirmado y será enviado a la dirección proporcionada. Te enviaremos un correo de confirmación con los detalles de la entrega.</p>
+</body>
+</html>

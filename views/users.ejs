@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios</title>
+</head>
+<body>
+    <h1>Administración de Usuarios</h1>
+    
+  
+    <ul>
+        <% users.forEach((user) => { %>
+            <li>
+                <strong>Nombre:</strong> <%= user.name %><br>
+                <strong>Correo:</strong> <%= user.email %><br>
+                <strong>Rol:</strong> <%= user.role %><br>
+
+             
+                <form action="/api/users/<%= user._id %>/update-role" method="POST">
+                    <label for="role">Cambiar Rol:</label>
+                    <select name="role" id="role">
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                        <option value="premium">Usuario Premium</option>
+                    </select>
+                    <button type="submit">Actualizar Rol</button>
+                </form>
+
+                
+                <form action="/api/users/<%= user._id %>" method="POST">
+                    <button type="submit">Eliminar Usuario</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
+
+   
+    <a href="/logout">Cerrar Sesión</a>
+</body>
+</html>

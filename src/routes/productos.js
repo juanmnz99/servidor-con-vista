@@ -69,7 +69,6 @@ router.get('/', async (req, res) => {
 module.exports = router;*/
 // productos.js
 const express = require('express');
-const router = express.Router();
 const productosController = require('../controllers/productosController');
 
 router.get('/', productosController.obtenerProductos);
@@ -123,3 +122,49 @@ router.get('/api/products', productsController.getProducts);
 router.get('/api/products/:pid', productsController.getProductById);
 
 
+
+const express = require('express');
+
+
+
+router.get('/', (req, res) => {
+  
+  const products = [
+    { id: 1, name: 'Producto 1', price: 10 },
+    { id: 2, name: 'Producto 2', price: 20 },
+    // ...
+  ];
+
+ 
+  res.render('lista', { products });
+});
+
+module.exports = router;
+
+
+router.get('/:id', (req, res) => {
+  
+  const productId = req.params.id;
+  const product = getProductById(productId); 
+
+  res.render('detalle', { product });
+});
+
+
+
+module.exports = router;
+clear
+
+const express = require('express');
+const router = express.Router();
+
+
+router.get('/', (req, res) => {
+  
+  const cartItems = getCartItems(); 
+
+  res.render('vistaCarrito', { cartItems });
+});
+
+
+module.exports = router;

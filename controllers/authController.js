@@ -38,3 +38,10 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
+
+exports.rutaProtegida = (req, res) => {
+  
+  res.send('Bienvenido a la ruta protegida');
+};

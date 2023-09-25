@@ -2,7 +2,7 @@
 
 const Ticket = require('../models/Ticket'); 
 const Cart = require('../models/Cart');
-const Producto = require('../models/Producto');
+const Producto = require('../models/producto');
 
 
 const { createCustomError } = require('../errorHandler');
